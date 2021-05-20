@@ -136,10 +136,13 @@ BatchUtilities <- R6::R6Class(
       containerEnv <- list(name = "CONTAINER_NAME",
                            value = jobId)
 
+      timeoutEnv <- list(name = "DOCKER_CLIENT_TIMEOUT",
+                         value = "600")
+
       batchClient$taskOperations$add(
         jobId,
         taskId,
-        environmentSettings = list(setting, containerEnv),
+        environmentSettings = list(setting, containerEnv, timeoutEnv),
         resourceFiles = resourceFiles,
         commandLine = commands,
         dependsOn = dependsOn,

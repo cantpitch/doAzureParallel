@@ -191,14 +191,16 @@ makeCluster <-
         c(commandLine,
           dockerRunCommand(dockerImage, packages, NULL, FALSE, FALSE))
     }
+    
 
     environmentSettings <- data.frame(name = character(), value = character())
-    
-    environmentSettings <- rbind(
-      environmentSettings,
-      data.frame(name = "DOCKER_CLIENT_TIMEOUT", value = "120")
-    )
 
+    environmentSettings <- rbind(
+        environmentSettings,
+        data.frame(name = "DOCKERT_CLIENT_TIMEOUT",
+                   value = "600")
+      )
+    
     if (!is.null(config$githubAuthenticationToken) &&
         config$githubAuthenticationToken != "") {
       environmentSettings <- rbind(

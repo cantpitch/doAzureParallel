@@ -150,7 +150,7 @@ dockerRunCommand <-
     }
 
     dockerRunCommand <-
-      paste("docker run", dockerOptions, containerImage, command)
+      paste("DOCKER_CLIENT_TIMEOUT=600 docker run", dockerOptions, containerImage, command)
     dockerRunCommand
   }
 
