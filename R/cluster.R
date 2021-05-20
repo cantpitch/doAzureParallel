@@ -197,7 +197,7 @@ makeCluster <-
 
     environmentSettings <- rbind(
         environmentSettings,
-        data.frame(name = "DOCKERT_CLIENT_TIMEOUT",
+        data.frame(name = "DOCKER_CLIENT_TIMEOUT",
                    value = "600")
       )
     
