@@ -50,24 +50,24 @@ getJob <- function(jobId, verbose = TRUE) {
     jobId)
 
   tasks <- list(
-    active = taskCounts$active,
-    running = taskCounts$running,
-    completed = taskCounts$completed,
-    succeeded = taskCounts$succeeded,
-    failed = taskCounts$failed
+    active = taskCounts$taskCounts$active,
+    running = taskCounts$taskCounts$running,
+    completed = taskCounts$taskCounts$completed,
+    succeeded = taskCounts$taskCounts$succeeded,
+    failed = taskCounts$taskCounts$failed
   )
 
   if (verbose == TRUE) {
     cat("\ntasks:", fill = TRUE)
-    cat(sprintf("\tactive: %s", taskCounts$active), fill = TRUE)
-    cat(sprintf("\trunning: %s", taskCounts$running), fill = TRUE)
-    cat(sprintf("\tcompleted: %s", taskCounts$completed), fill = TRUE)
-    cat(sprintf("\t\tsucceeded: %s", taskCounts$succeeded), fill = TRUE)
-    cat(sprintf("\t\tfailed: %s", taskCounts$failed), fill = TRUE)
+    cat(sprintf("\tactive: %s", taskCounts$taskCounts$active), fill = TRUE)
+    cat(sprintf("\trunning: %s", taskCounts$taskCounts$running), fill = TRUE)
+    cat(sprintf("\tcompleted: %s", taskCounts$taskCounts$completed), fill = TRUE)
+    cat(sprintf("\t\tsucceeded: %s", taskCounts$taskCounts$succeeded), fill = TRUE)
+    cat(sprintf("\t\tfailed: %s", taskCounts$taskCounts$failed), fill = TRUE)
     cat(
       sprintf(
         "\ttotal: %s",
-        taskCounts$active + taskCounts$running + taskCounts$completed
+        taskCounts$taskCounts$active + taskCounts$taskCounts$running + taskCounts$taskCounts$completed
       ),
       fill = TRUE
     )
@@ -131,11 +131,11 @@ getJobList <- function(filter = NULL) {
         config$batchClient$jobOperations$getJobTaskCounts(
           jobId = jobs$value[[j]]$id)
       failedTasks[j] <-
-        as.integer(taskCounts$failed)
+        as.integer(taskCounts$taskCounts$failed)
       totalTasks[j] <-
-        as.integer(taskCounts$active + taskCounts$running + taskCounts$completed)
+        as.integer(taskCounts$taskCounts$active + taskCounts$taskCounts$running + taskCounts$taskCounts$completed)
 
-      completed <- as.integer(taskCounts$completed)
+      completed <- as.integer(taskCounts$taskCounts$completed)
 
       if (totalTasks[j] > 0) {
         status[j] <-
@@ -441,28 +441,28 @@ waitForTasksToComplete <-
 
       # Assumption: Merge task will always be the last one in the queue
       if (enableCloudCombine) {
-        if (taskCounts$completed > totalTasks) {
-          taskCounts$completed <- totalTasks
+        if (taskCounts$taskCounts$completed > totalTasks) {
+          taskCounts$taskCounts$completed <- totalTasks
         }
 
-        if (taskCounts$completed == totalTasks && taskCounts$running == 1) {
-          taskCounts$running <- 0
+        if (taskCounts$taskCounts$completed == totalTasks && taskCounts$taskCounts$running == 1) {
+          taskCounts$taskCounts$running <- 0
         }
 
-        if (taskCounts$active >= 1) {
-          taskCounts$active <- taskCounts$active - 1
+        if (taskCounts$taskCounts$active >= 1) {
+          taskCounts$taskCounts$active <- taskCounts$taskCounts$active - 1
         }
       }
 
-      runningOutput <- paste0("Running: ", taskCounts$running)
-      queueOutput <- paste0("Queued: ", taskCounts$active)
-      completedOutput <- paste0("Completed: ", taskCounts$completed)
-      failedOutput <- paste0("Failed: ", taskCounts$failed)
+      runningOutput <- paste0("Running: ", taskCounts$taskCounts$running)
+      queueOutput <- paste0("Queued: ", taskCounts$taskCounts$active)
+      completedOutput <- paste0("Completed: ", taskCounts$taskCounts$completed)
+      failedOutput <- paste0("Failed: ", taskCounts$taskCounts$failed)
 
       cat("\r",
           sprintf("| %s | %s | %s | %s | %s |",
-                  paste0("Progress: ", sprintf("%.2f%% (%s/%s)", (taskCounts$completed / totalTasks) * 100,
-                                               taskCounts$completed,
+                  paste0("Progress: ", sprintf("%.2f%% (%s/%s)", (taskCounts$taskCounts$completed / totalTasks) * 100,
+                                               taskCounts$taskCounts$completed,
                                                totalTasks)),
                   runningOutput,
                   queueOutput,
@@ -472,7 +472,7 @@ waitForTasksToComplete <-
 
       flush.console()
 
-      if (taskCounts$failed > 0 &&
+      if (taskCounts$taskCounts$failed > 0 &&
           errorHandling == "stop") {
         cat("\n")
 
@@ -489,7 +489,7 @@ waitForTasksToComplete <-
               "To disable this behavior and continue on failure, set .errorHandling='remove | pass'",
               "in the foreach loop\n"
             ),
-            taskCounts$failed
+            taskCounts$taskCounts$failed
           )
 
         for (i in 1:length(failedTasks$value)) {
@@ -499,7 +499,7 @@ waitForTasksToComplete <-
         }
 
         warning(sprintf(tasksFailureWarningLabel,
-                        taskCounts$failed))
+                        taskCounts$taskCounts$failed))
 
         response <- batchClient$jobOperations$terminateJob(jobId)
         httr::stop_for_status(response)
@@ -524,7 +524,7 @@ waitForTasksToComplete <-
       }
 
       jobInfo <- getJob(jobId, verbose = FALSE)
-      if (taskCounts$completed >= totalTasks ||
+      if (taskCounts$taskCounts$completed >= totalTasks ||
           jobInfo$jobState == "completed" ||
           jobInfo$jobState == "terminating") {
         cat("\n")
