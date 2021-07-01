@@ -282,7 +282,7 @@ makeBatchClient <- function(config) {
       resourceGroup = info$resourceGroup,
       subscriptionId = info$subscriptionId,
       servicePrincipal = servicePrincipal,
-      verbose = TRUE
+      verbose = FALSE
     )
 
     baseUrl <- sprintf("https://%s/",
@@ -340,7 +340,7 @@ makeStorageClient <- function(config) {
       resourceGroup =  info$resourceGroup,
       subscriptionId = info$subscriptionId,
       servicePrincipal = servicePrincipal,
-      verbose = TRUE
+      verbose = FALSE
     )
 
     storageCredentials <- rAzureBatch::SharedKeyCredentials$new(
